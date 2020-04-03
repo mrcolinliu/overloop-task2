@@ -21,17 +21,10 @@ class Create extends Component {
       title: '',
       content: '',
       territory: '',
-      territoryUK: false,
-      territoryFrance: false,
-      testVar: {
-        testVal: 'Colin',
-      },
-      territoriesTest: [{"country":'UK',"checked":true}],
+      territories: [{"country":'UK',"checked":false},{"country":'France',"checked":false}],
       error: null,
       errors: {},
     };
-
-    console.log("State val>"+this.state.territoriesTest[0].checked);
 
   }
 
@@ -39,9 +32,7 @@ class Create extends Component {
     if(this.state.loading) return;
     this.setState({
       title: ev.target.value,
-    },
-      () => console.log(this.state.title),
-    );
+    });
   }
 
   updateContent(ev) {
@@ -51,43 +42,20 @@ class Create extends Component {
     });
   }
 
-  // territoryCheck(country){
-  //   console.log("Country->"+country);
-  //     return true;
-  //   this.state.territoriesTest.forEach(function(item, index) {
-  //     console.log("Hello");
-
-  //   });
-  // }
-
   //For some reason using the old function format not working
-  updateTerritoryUK = () => {
-    this.setState(prevState => ({
-      territoryUK: !prevState.territoryUK,
-    }));
+  updateTerritory = (ev) => {
+    let idName = ev.target.id;
+
+    this.setState(state => ({
+      territories: state.territories.map((item, j) => {
+            if (item.country === idName){
+              item.checked = !item.checked;
+            }
+            return item;
+          }),
+    }),
+      console.log(this.state.territories));
   }
-
-  updateTerritoryFrance = () => {
-    this.setState(prevState => ({
-      territoryFrance: !prevState.territoryFrance,
-    }));
-  }
-
- updateTerritory = i => {
-    this.setState(state => {
-      const territoriesTest = state.territoriesTest.map((item, key) => {
-        if (key === i) {
-          return !item;
-        } else {
-          return item;
-        }
-      });
-      return {
-        territoriesTest,
-      };
-    });
-  };
-
 
   submit() {
     let territories = [];
@@ -98,8 +66,14 @@ class Create extends Component {
       // Setup Variables
       for (var key in this.state) {
         // We know it's a checkbox for the territories
-        if(this.state[key] === true && key !== "loading") {
-          territories.push(key);
+        if (key === 'territories'){
+          this.state[key].forEach(function(item){
+            if(item.country !== null && item.checked === true) {
+              territories.push(item.country);
+            }
+          })
+
+          break;
         }
       }
 
@@ -175,47 +149,31 @@ class Create extends Component {
 
         <FormGroup row>
           <Label sm={2}>Territories</Label>
-          <Label for="territoryUK" sm={3}>United Kingdom</Label>
+          <Label for="UK" sm={3}>United Kingdom</Label>
           <Col sm={2}>
             <Input
               type="checkbox"
-              checked={this.state.territoryUK}
-              name="territoryUK"
-              id="territoryUK"
-              onChange={this.updateTerritoryUK}
+              checked={this.state.territories[0].checked}
+              name="UK"
+              id="UK"
+              onChange={e => this.updateTerritory(e)}
              />
           </Col>
         </FormGroup>
 
         <FormGroup row>
           <Label sm={2}></Label>
-          <Label for="territoryFrance" sm={3}>France</Label>
+          <Label for="France" sm={3}>France</Label>
           <Col sm={2}>
             <Input
               type="checkbox"
-              checked={this.state.territoryFrance}
-              name="territoryFrance"
-              id="territoryFrance"
-              onChange={this.updateTerritoryFrance}
+              checked={this.state.territories[1].checked}
+              name="France"
+              id="France"
+              onChange={e => this.updateTerritory(e)}
              />
           </Col>
         </FormGroup>
-
-        <FormGroup row>
-          <Label sm={2}></Label>
-          <Label for="territoriesTest" sm={3}>Test UK</Label>
-          <Col sm={2}>
-            <Input
-              type="checkbox"
-
-
-              name="territoriesTest"
-              id="territoriesTest"
-              onChange={this.updateTerritoryFrance}
-             />
-          </Col>
-        </FormGroup>
-
 
         <FormGroup check row>
           <Col sm={{ size: 10, offset: 2 }}>

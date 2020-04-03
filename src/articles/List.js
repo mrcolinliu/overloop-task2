@@ -1,14 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  Col,
-  Form,
-  FormFeedback,
-  FormGroup,
-  Input,
-  Label,
-} from 'reactstrap';
+import { Button } from 'reactstrap';
 
 import './List.css';
 
@@ -53,36 +45,6 @@ class List extends Component {  constructor(props) {
     this.fetch();
   }
 
-  updateSearch(ev) {
-
-    this.setState({
-      loading: true,
-    }, async () => {
-      let searchWord = "France";
-     // Post JSON string to MongoDB
-      let result = await fetch('/api/articles/search/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          searchWord: searchWord,
-
-        }),
-      });
-      let json = await result.json();
-        document.getElementById("dataSearch").innerHTML = "Option 2 has changed this DIV tag's content";
-
-      this.setState({
-        loading: false,
-        error: null,
-        dataSearch: json.articles,
-      });
-
-  });
-
-  }
-
   render() {
     if(this.state.error) {
       return <div>{this.state.error.toString()}</div>;
@@ -103,30 +65,12 @@ class List extends Component {  constructor(props) {
                 <h4>{article.title}</h4>
               </Link>
               <div>{article.content}</div>
+              <div>Territories: {article.territory}</div>
             </li>
           )}
         </ul>
 
-        <div id="SearchContent">
-
-        <FormGroup row>
-          <Label for="search" sm={2}>Search</Label>
-          <Col sm={10}>
-            <Input
-              type="input"
-              name="search"
-              id="search"
-              placeholder="Search Territories"
-              onChange={e => this.updateSearch()}
-              value={this.state.search}
-              disabled={this.state.loading} />
-          </Col>
-        </FormGroup>
-
-          <div id="dataSearch"></div>
-
-        </div>
-      </React.Fragment>
+       </React.Fragment>
     );
   }
 }

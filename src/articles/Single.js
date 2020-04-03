@@ -21,8 +21,7 @@ class Single extends Component {
       title: '',
       content: '',
       territory: '',
-      territoryUK: false,
-      territoryFrance: false,
+      territories: [{"country":'UK',"checked":false},{"country":'France',"checked":false}],
       errors: {},
     };
   }
@@ -42,17 +41,19 @@ class Single extends Component {
   }
 
   //For some reason using the old function format not working
-  updateTerritoryUK = () => {
-    this.setState(prevState => ({
-      territoryUK: !prevState.territoryUK,
+  updateTerritory = (ev) => {
+    let idName = ev.target.id;
+
+    this.setState(state => ({
+      territories: state.territories.map((item, j) => {
+            if (item.country === idName){
+              item.checked = !item.checked;
+            }
+            return item;
+          }),
     }));
   }
 
-  updateTerritoryFrance = () => {
-    this.setState(prevState => ({
-      territoryFrance: !prevState.territoryFrance,
-    }));
-  }
 
   async fetch(id) {
     if(!id) {
@@ -78,15 +79,21 @@ class Single extends Component {
         title: json.article.title,
         content: json.article.content,
         territory: json.article.territory,
-
       });
 
       // Setup Territories
       let territories = this.state.territory.split(',');
       for (const [, value] of territories.entries()) {
-          this.setState({
-            [value]: true,
-          });
+        this.setState(state => ({
+            territories: state.territories.map((item, j) => {
+              // If territory must be checked
+              if (item.country === value){
+                item.checked = true;
+              }
+              return item;
+            }),
+
+          }));
       }
 
     } catch(e) {
@@ -106,11 +113,16 @@ class Single extends Component {
       // Setup Variables
       for (var key in this.state) {
         // We know it's a checkbox for the territories
-        if(this.state[key] === true && key !== "loading") {
-          territories.push(key);
+        if (key === 'territories'){
+          this.state[key].forEach(function(item){
+            if(item.country !== null && item.checked === true) {
+              territories.push(item.country);
+            }
+          })
+
+          break;
         }
       }
-
       let result = await fetch(`/api/articles/${this.state.id}/`, {
         method: 'PUT',
         headers: {
@@ -192,28 +204,28 @@ class Single extends Component {
         </FormGroup>
         <FormGroup row>
           <Label sm={2}>Territories</Label>
-          <Label for="territoryUK" sm={3}>United Kingdom</Label>
+          <Label for="UK" sm={3}>United Kingdom</Label>
           <Col sm={2}>
             <Input
               type="checkbox"
-              checked={this.state.territoryUK}
-              name="territoryUK"
-              id="territoryUK"
-              onChange={this.updateTerritoryUK}
+              checked={this.state.territories[0].checked}
+              name="UK"
+              id="UK"
+              onChange={e => this.updateTerritory(e)}
              />
           </Col>
         </FormGroup>
 
         <FormGroup row>
           <Label sm={2}></Label>
-          <Label for="territoryFrance" sm={3}>France</Label>
+          <Label for="France" sm={3}>France</Label>
           <Col sm={2}>
             <Input
               type="checkbox"
-              checked={this.state.territoryFrance}
-              name="territoryFrance"
-              id="territoryFrance"
-              onChange={this.updateTerritoryFrance}
+              checked={this.state.territories[1].checked}
+              name="France"
+              id="France"
+              onChange={e => this.updateTerritory(e)}
              />
           </Col>
         </FormGroup>
