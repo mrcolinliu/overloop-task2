@@ -53,8 +53,7 @@ class Create extends Component {
             }
             return item;
           }),
-    }),
-      console.log(this.state.territories));
+    }));
   }
 
   submit() {
